@@ -3,4 +3,15 @@
 }
 .day {
     text-align: center;
+    cursor: pointer;
+}
+
+.month {
+    display: inline-block;
+    margin: 1em;
+    margin-right: 2em;
+}
+
+.entry_li {
+    list-style-type: none;
 }
