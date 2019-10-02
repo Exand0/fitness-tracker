@@ -1,63 +1,23 @@
 const container = document.querySelector('.container');
 const calendarCont = document.querySelector('.calendar_container');
 const monthCont = document.querySelector('.month_container');
-const calendarTable = document.querySelector('.calendar_table');
+const monthTable = document.querySelector('.month_table');
 const monthLabel = document.querySelector('.month_label');
+const yearLabel = document.querySelector('.year_label');
 const dayCont = document.querySelector('.day_container');
+const inputField = document.querySelector('.input_field');
+const inputButton = document.querySelector('.input_button');
 
-let yearArr = [];
+let yearArr = Array(12);
 
-class Day {
-    constructor(weekDayNum, dayNum, isWeekend = false) {
-        this.entryArr = [];
-        this.weekDayNum = weekDayNum;
-        this.dayNum = dayNum;
-        this.isWeekend = isWeekend;
-    }
-    addEntry(entryData) {
-        this.entryArr.push(entryData);
-    }
-    deleteEntry(target) {
-        const id = target.parentNode.id;
-        this.entryArr.splice(id, 1);
-    } 
-    updateEntry(position, value) {
-        this.entryArr.splice(position, 1, value);
-    }
-    getEntry(position) {
-        return this.entryArr[position];
-    }
-    getEntryArr() {
-        return this.entryArr;
-    }
+for (let i = 0; i < 12; i++)  {
+    yearArr[i] = Array(31);
 }
 
-//let day = new Day(1, 2);
-
-container.addEventListener('click', e => handleClick(e));
 let indexCache;
-let dayCache;
 
-function openDay() {
-    dayCont.innerHTML = '';
-    let table = document.createElement('table');
-    let ul = document.createElement('ul');
-    let entryArr = day.getEntryArr();
-    entryArr.forEach((entry, index) => {
-        const li = document.createElement('li');
-        const button = document.createElement('button');
-        button.innerText = 'Delete';
-        button.classList.add('delete_button');
-        li.classList.add('entry_li');
-        li.innerText = entry;
-        li.id = index;
-        ul.appendChild(li);  
-        li.appendChild(button);
-    });
-    table.appendChild(ul);
-    dayCont.appendChild(table);
 
-}
+
 
 
 function toggleButton() {
@@ -71,101 +31,153 @@ function toggleButton() {
 
 }
 
-function handleClick(e) {
-    const className = e.target.className;
-    if (className === 'delete_button') {
-        day.deleteEntry(e.target);
-    } else if (className === 'entry_li') {
-        indexCache = e.target.id;
-        let  val = day.getEntry(indexCache);
-        inputField.value = val;
-        toggleButton();
-    } else if (className === 'input_button') {
-        day.addEntry(inputField.value);
-        inputField.value = '';
-    } else if (className === 'update_button') {
-        day.updateEntry(indexCache, inputField.value);
-        toggleButton();
-        inputField.value = '';
-        indexCache = '';
-    } else if (className === 'day') {
-        dayCache = e.target.id;
-
+class Day {
+    constructor(dayNum) {
+        this.dayNum = dayNum,
+        this.entryList = [];
     }
-    openDay(e.target);
+    addEntry(entryData) {
+        this.entryList.push(entryData);
+        console.log(this.entryList);
+    }
+    deleteEntry(target) {
+        const id = target.parentNode.id;
+        this.entryList.splice(id, 1);
 
+    } 
+    updateEntry(position, value) {
+        this.entryList.splice(position, 1, value);
+    }
 }
 
-class Month {
-    constructor(year, monthNum) {
+let calendar = {
+    year: (new Date()).getFullYear(),
+    monthNum: (new Date()).getMonth(),
+    dayCache: 0,
+    setYear: function(year) {
         this.year = year;
-        this.monthNum = monthNum;
-        this.firstDay = new Date(this.year, this.monthNum - 1, 1);
-        this.lastDay = new Date(this.year, this.monthNum, 0);
-        this._firstWeekDay;
-        this.dayArr = [];
-    }
-    set firstWeekDay(day) {
-        this._firstWeekDay = ((this.firstDay.getDay() + 7 - day) % 7);
-    }
-    get firstWeekDay() {
-        return this._firstWeekDay;
-    }
-    get monthName() {
-        return this.firstDay.toLocaleString('default', {month: 'long'});
-    }
-    get dayCount() {
-        return this.lastDay.getDate();
-    }
-    buildMonth() {
-        for (let i = 1; i <= this.dayCount; i++ ) {
-            this.dayArr.push(new Day(1, i));
+    },
+    getFirstDay: function() {
+        return new Date(this.year, this.monthNum - 1, 1);
+    },
+    getLastDay: function() {
+        return new Date(this.year, this.monthNum, 0);
+    },
+    getMonthName: function() {
+        return this.getFirstDay().toLocaleString('default', {month: 'long'});
+    },
+    getDayCount: function() {
+        return this.getLastDay().getDate();
+    },
+    setFirstWeekDay: function (day) {
+        return ((this.getFirstDay().getDay() + 7 - day) % 7);
+    },
+    initMontArr: function() {
+        const days = this.getDayCount();
+        monthArr = Array(days);
+    },
+    drawMonth: function () {
+        //this.initMontArr();
+        monthTable.innerHTML = '';
+        monthTable.id = this.monthNum;
+        monthLabel.innerText = this.getMonthName();
+        yearLabel.innerText = (new Date).getFullYear();
+        let tr;
+        for (let index = (-1) * this.setFirstWeekDay(1) + 1, day = 0; index <= this.getDayCount(); index++, day++) {
+            let td = document.createElement('td');
+            if (((day ===  5) || (day ===  6)) && index > 0) {
+                td.classList.add('holiday');
+                //monthObj.dayArr[index - 1].isWeekend = true;
+            }
+            if (!(day%7)) {
+                tr = document.createElement('tr');
+                monthTable.appendChild(tr);
+                day = 0;
+            }
+            if (index > 0) {
+                td.classList.add('day');
+                td.innerText = index; 
+                td.id = index;
+            }
+            tr.appendChild(td);
+        }
+        monthCont.appendChild(monthTable);
+    },
+    openDay: function (id) {
+        let day;
+        //console.log(yearArr[this.monthNum]);
+        if (typeof (yearArr[this.monthNum - 1][id]) !== 'object' ) {
+            day = new Day(id);
+            yearArr[this.monthNum - 1][id] = day;
+        } else {
+            day = yearArr[this.monthNum - 1][id];
+        }
+        //this.dayCache = day;
+        dayCont.innerHTML = '';
+        let table = document.createElement('table');
+        let ul = document.createElement('ul');
+        day.entryList.forEach((entry, index) => {
+            const li = document.createElement('li');
+            const button = document.createElement('button');
+            button.innerText = 'Delete';
+            button.classList.add('delete_button');
+            li.classList.add('entry_li');
+            li.innerText = entry;
+            li.id = index;
+            ul.appendChild(li);  
+            li.appendChild(button);
+        });
+        table.appendChild(ul);
+        dayCont.appendChild(table);
+    },
+    handleClick: function(e) {
+        const className = e.target.className;
+        let day = yearArr[this.monthNum - 1][this.dayCache];
+        if (className === 'delete_button') {
+            day.deleteEntry(e.target);
+            this.openDay(this.dayCache);
+        } else if (className === 'entry_li') {
+            //indexCache = e.target.id;
+            //let val = day.getEntry(indexCache);
+            inputField.value = day.entryList[e.target.id];
+            toggleButton();
+        } else if (className === 'input_button') {
+            //let day = yearArr[this.monthNum - 1][this.dayCache];
+            day.addEntry(inputField.value);
+            inputField.value = '';
+            console.log(yearArr);
+            this.openDay(this.dayCache);
+        } else if (className === 'update_button') {
+            day.updateEntry(indexCache, inputField.value);
+            toggleButton();
+            inputField.value = '';
+            indexCache = '';
+            this.openDay(e.target);
+        // contains class
+        } else if (e.target.classList.contains('day')) {
+            this.dayCache = e.target.id;
+            this.openDay(this.dayCache);
+        } else if (className === 'button_next') {
+            if (calendar.monthNum === 12) {
+                calendar.monthNum = 1;
+                calendar.year++;
+            } else {
+                calendar.monthNum++;
+            }
+            this.drawMonth();
+        } else if (className === 'button_previous') {
+            if (calendar.monthNum === 1) {
+                calendar.monthNum = 12;
+                calendar.year--;
+            } else {
+                calendar.monthNum--;
+            }
+            calthis.endar.drawMonth();
         }
     }
 }
 
-function drawMonth(monthObj) {
-    monthLabel.innerText = monthObj.monthName;
-    let tr;
-    for (let index = (-1) * monthObj.firstWeekDay + 1, day = 0; index <= monthObj.dayCount; index++, day++) {
-        let td = document.createElement('td');
-        td.classList.add('day');
 
-        if (((day ===  5) || (day ===  6)) && index > 0) {
-            td.classList.add('holiday');
+container.addEventListener('click', e => calendar.handleClick(e));
+calendar.drawMonth();
 
-            monthObj.dayArr[index - 1].isWeekend = true;
-        }
-
-        if (!(day%7)) {
-            tr = document.createElement('tr');
-            calendarTable.appendChild(tr);
-            day = 0;
-        }
-
-        if (index > 0) {
-            td.innerText = index; 
-            td.id = index;
-        }
-        tr.appendChild(td);
-    }
-}
-
-// function drawYear(year) {
-//     for (let i = 1; i <= 1; i++) {
-//         let month = new Month(year, i);    
-//         month.buildMonth(); 
-//         month.firstWeekDay = 1; 
-//         yearArr.push(month);
-//         drawMonth(month);  
-//     }
-// }
-
-
-let month = new Month(2019, 9)
-month.buildMonth();
-month.firstWeekDay = 1;
-drawMonth(month);
-
-
-//drawYear(2019);
