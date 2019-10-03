@@ -9,21 +9,45 @@
     </head>
     <body>
         <div class="container">
-            <input class="input_field">
-            <button class="input_button">Add</button>
             <div class="calendar_container">
                 <div class="month_container">
-                    <button class="button_previous">Previous</button>
-                    <button class="button_next">Next</button>
-                    <p class="year_label"></p>
-                    <p class="month_label"></p>
+                    <div class="calendar_nav">
+                        <!-- <button class="button_previous">Previous</button>
+                        <button class="button_next">Next</button> -->
+                        <div class="year_control">
+                                <div class="button_previous year"></div>
+                                <p class="year_label"></p>
+                                <div class="button_next year"></div>
+                            </div>
+                        <div class="month_control">
+                            <div class="button_previous month"></div>
+                            <p class="month_label"></p>
+                            <div class="button_next month"></div>
+                        </div>
+                    </div>
+                    <table class="weekday_label">
+                        <tr>
+                            <td>Mon</td>
+                            <td>Tue</td>
+                            <td>Wed</td>
+                            <td>Thu</td>
+                            <td>Fr</td>
+                            <td>Sat</td>
+                            <td>Sun</td>
+                        </tr>
+                    </table>
                     <table class="month_table">
                     </table>
                 </div>
-                <div class="day_container"></div>
+                <div class="day_container inactive">
+                    <input class="input_field">
+                    <button class="input_button">Add</button>
+                    <div class="day_entries"></div>
+                </div>
             </div>
         </div>
     <script src="data/js/core.js"></script>
     <script src="data/js/calendar.js"></script>
     </body>
 </html>
+<!-- <div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div> -->
