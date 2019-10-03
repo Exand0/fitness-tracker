@@ -8,16 +8,8 @@ const dayCont = document.querySelector('.day_container');
 const dayEntries = document.querySelector('.day_entries');
 const inputField = document.querySelector('.input_field');
 const inputButton = document.querySelector('.input_button');
-
-let yearArr = Array(12);
-
-console.log((new Date()).getMonth());
-console.log(new Date(2019, 11, 1));
-
-for (let i = 0; i < 12; i++) {
-    yearArr[i] = Array(31);
-}
-
+const workoutTable = document.querySelector('.workout_table');
+const workoutInputArr = Array.from(document.querySelectorAll('.exercise_input'));
 
 class Day {
     constructor(dayNum) {
@@ -35,6 +27,75 @@ class Day {
     updateEntry(position, value) {
         this.entryList.splice(position, 1, value);
     }
+}
+
+class WorkoutEntry {
+    constructor() {
+        this.exerciseName = 'None';
+        this.restTime = 0;
+        this.weightRepsArr = [];
+    }
+    addEntry(entryData) {
+        this.exer.push(entryData);
+        console.log(this.entryList);
+    }
+    deleteEntry(target) {
+        const id = target.parentNode.id;
+        this.entryList.splice(id, 1);
+    }
+    updateEntry(position, value) {
+        this.entryList.splice(position, 1, value);
+    }
+}
+
+let yearArr = Array(12);
+for (let i = 0; i < 12; i++) {
+    yearArr[i] = Array(31);
+}
+ 
+
+function gatherInput(inputElementsArr) {
+    let weightRepArr = [];
+    let entry = new WorkoutEntry;
+    workoutInputArr.forEach(element => {
+        if (element.classList.contains('exercise_name')) {
+            entry.exerciseName = element.value;
+        } else if (element.classList.contains('exercise_rest')) {
+            entry.restTime = element.value;
+        } else {
+            weightRepArr.push(element.value);
+        }
+    });
+    weightRepArr.reduce((previous, current, index, initArr) => {
+        if (index % 2 === 0) {
+            previous.push(initArr.slice(index, index + 2));
+        } 
+        return previous;   
+    }, []);
+    console.table(weightRepArr);
+}
+gatherInput(workoutInputArr);
+
+// arr = [[1,2], [1,2], [1,2]];
+// console.table(arr);
+
+function drawTemplate() {
+    workoutTable.innerHTML = '';
+    let table = document.createElement('table');
+    let ul = document.createElement('ul');
+    day.entryList.forEach((entry, index) => {
+        const li = document.createElement('li');
+        const button = document.createElement('button');
+        button.innerText = 'Delete';
+        button.classList.add('delete_button');
+        li.classList.add('entry_li');
+        li.innerText = entry;
+        li.id = index;
+        ul.appendChild(li);
+        li.appendChild(button);
+    });
+    table.appendChild(ul);
+    dayEntries.appendChild(table);
 }
 
 let calendar = {
@@ -95,7 +156,7 @@ let calendar = {
             day = yearArr[this.monthNum ][id];
         }
         dayEntries.innerHTML = '';
-        let table = document.createElement('table');
+        //let table = document.createElement('table');
         let ul = document.createElement('ul');
         day.entryList.forEach((entry, index) => {
             const li = document.createElement('li');
@@ -108,8 +169,7 @@ let calendar = {
             ul.appendChild(li);
             li.appendChild(button);
         });
-        table.appendChild(ul);
-        dayEntries.appendChild(table);
+        dayEntries.appendChild(ul);
     },
     handleClick: function (e) {
         const className = e.target.className;
@@ -150,29 +210,29 @@ let calendar = {
             this.dayCache = e.target;
             this.openDay(this.dayCache.id);
         } else if (className === 'button_next month') {
-            if (calendar.monthNum === 11) {
-                calendar.monthNum = 0;
-                calendar.year++;
+            if (this.monthNum === 11) {
+                this.monthNum = 0;
+                this.year++;
             } else {
-                calendar.monthNum++;
+                this.monthNum++;
             }
-            console.log(calendar.year);
-            console.log(calendar.monthNum);
             this.drawMonth();
         } else if (className === 'button_previous month') {
-            if (calendar.monthNum === 0) {
-                calendar.monthNum = 11;
-                calendar.year--;
+            if (this.monthNum === 0) {
+                this.monthNum = 11;
+                this.year--;
             } else {
-                calendar.monthNum--;
+                this.monthNum--;
             }
             this.drawMonth();
         } else if (className === 'button_next year') {
-            calendar.year++;
+            this.year++;
             this.drawMonth();
         } else if (className === 'button_previous year') {
-            calendar.year--;
+            this.year--;
             this.drawMonth();
+        } else if (className === 'button_exercise_add') {
+            console.log('test');
         }
     },
     toggleButton: function() {

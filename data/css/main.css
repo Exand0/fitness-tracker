@@ -89,3 +89,25 @@
 .entry_li {
     list-style-type: none;
 }
+
+.workout_input_label td {
+    text-align: center;
+}
+
+.workout_table tr td input{
+    max-width: 5em;
+}
+
+.exercise_weight {
+    width: 3em;
+}
+
+.exercise_reps {
+    width: 3em;
+}
+
+.exercise_rest {
+    width: 3em;
+}
+
+
