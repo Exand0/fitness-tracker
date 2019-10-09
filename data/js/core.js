@@ -26,6 +26,7 @@ class Day {
     }
     updateEntry(position, value) {
         this.entryList.splice(position, 1, value);
+        console.log(value);
     }
 }
 
@@ -37,12 +38,9 @@ for (let i = 0; i < 12; i++) {
 let calendar = {
     year: (new Date()).getFullYear(),
     monthNum: (new Date()).getMonth(),
+    today: (new Date()).getDate(),
     dayCache: '',
-    indexCache: '',
     dayIsActive: false,
-    setYear: function (year) {
-        this.year = year;
-    },
     getFirstDay: function () {
         return new Date(this.year, this.monthNum, 1);
     },
@@ -64,6 +62,7 @@ let calendar = {
         monthLabel.innerText = this.getMonthName();
         yearLabel.innerText = this.year;
         let tr;
+
         for (let index = (-1) * this.setFirstWeekDay(1) + 1, day = 0; index <= this.getDayCount(); index++ , day++) {
             let td = document.createElement('td');
             if (((day === 5) || (day === 6)) && index > 0) {
@@ -78,6 +77,9 @@ let calendar = {
                 td.classList.add('day');
                 td.innerText = index;
                 td.id = index;
+                if (index === this.today) {
+                    td.classList.add('today');
+                }
             }
             tr.appendChild(td);
         }
@@ -109,19 +111,13 @@ let calendar = {
                 const td = document.createElement('td');
                 const input = document.createElement('input');
                 input.value = val;
+
                 switch(ind) {
                     case 0:
                         input.classList.add('exercise_name', 'exercise_input');
                         break;
-                    case 1:
-                        input.classList.add('exercise_rest', 'exercise_input');
-                        break;
                     default:
-                        if(ind % 2 === 0) {
-                            input.classList.add('exercise_weight', 'exercise_input');
-                        } else {
-                            input.classList.add('exercise_reps', 'exercise_input'); 
-                        }
+                        input.classList.add('exercise_input'); 
                         break;
                 }
                 td.appendChild(input);
@@ -134,16 +130,6 @@ let calendar = {
             workoutOutput.appendChild(row);
         });
     },
-    toggleButton: function() {
-        if (inputButton.className === 'update_button') {
-            inputButton.innerText = 'Add';
-        } else if (inputButton.className === 'input_button') {
-            inputButton.innerText = 'Update';
-        }
-        inputButton.classList.toggle('input_button');
-        inputButton.classList.toggle('update_button');
-    
-    },
     handleClick: function (e) {
         const className = e.target.className;
         let day = yearArr[this.monthNum][this.dayCache.id];
@@ -151,25 +137,30 @@ let calendar = {
         if (className === 'delete_button') {
             day.deleteEntry(e.target);
             this.openDay(this.dayCache.id);
-        } else if (className === 'entry_li') {
-            this.indexCache = e.target.id;
-            inputField.value = day.entryList[e.target.id];
-            this.toggleButton();
+
+        } else if (e.target.classList.contains('add_button')) {
+            let row = e.target.parentNode.parentNode;
+            day.addEntry(this.gatherInput(row));
+            this.openDay(this.dayCache.id);
+
         } else if (className === 'input_button') {
             day.addEntry(inputField.value);
             inputField.value = '';
             this.openDay(this.dayCache.id);
+
         } else if (className === 'update_button') {
-            day.updateEntry(this.indexCache, inputField.value);
-            this.toggleButton();
-            indexCache = '';
+            let row = e.target.parentNode.parentNode;
+            day.updateEntry(row.id, this.gatherInput(row));
             this.openDay(this.dayCache.id);
+
         } else if (e.target.classList.contains('day')) {
             if (!this.dayIsActive) {
                 this.dayIsActive = true;
                 e.target.classList.add('active');
                 dayCont.classList.remove('inactive');  
+
             } else {
+
                 if (this.dayCache.id != e.target.id) {
                     e.target.classList.add('active');
                     this.dayCache.classList.remove('active');   
@@ -182,6 +173,7 @@ let calendar = {
             this.dayCache = e.target;
             this.openDay(this.dayCache.id);
         } else if (className === 'button_next month') {
+
             if (this.monthNum === 11) {
                 this.monthNum = 0;
                 this.year++;
@@ -189,10 +181,12 @@ let calendar = {
                 this.monthNum++;
             }
             this.drawMonth();
+
         } else if (className === 'button_previous month') {
             if (this.monthNum === 0) {
                 this.monthNum = 11;
                 this.year--;
+
             } else {
                 this.monthNum--;
             }
@@ -200,18 +194,17 @@ let calendar = {
         } else if (className === 'button_next year') {
             this.year++;
             this.drawMonth();
+
         } else if (className === 'button_previous year') {
             this.year--;
             this.drawMonth();
-        } else if (e.target.classList.contains('button_exercise_add')) {
-            day.addEntry(this.gatherInput());
-            this.openDay(this.dayCache.id);
-            window.localStorage.setItem('yearArr', JSON.stringify(yearArr));
         }
     },
-    gatherInput: function(workoutInputArr) {
+    gatherInput: function(row) {
+        const inputArr = Array.from(row.querySelectorAll('input'));
         entryArr = [];
-        workoutInputArr.forEach(element => {
+
+        inputArr.forEach(element => {
                 entryArr.push(element.value);
                 element.value = '';
         });

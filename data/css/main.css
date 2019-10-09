@@ -5,19 +5,19 @@
     text-align: center;
     cursor: pointer;
     padding: 0.5em;
+    width: 2em;
+    height: 2em;
 }
 
 .day.active {
     background: rgba(0, 144, 247, 0.5);
 }
 
-/* .weekday_label {
-
-} */
-
 .weekday_label td {
-    padding: 0.2em;
     text-align: center;
+    padding: 0.5em;
+    width: 2em;
+    height: 2em;
 }
 
 .calendar_nav {
@@ -79,32 +79,18 @@
     display: none;
 }
 
-.input_field {
-    display: inline-block;
-}
-
-.input_button {
-    display: inline-block;
-}
-.entry_li {
-    list-style-type: none;
-}
-
-.workout_input_label td {
+.workout_label td {
     text-align: center;
 }
 
-
-.exercise_weight {
+.exercise_input {
     width: 3em;
 }
 
-.exercise_reps {
-    width: 3em;
+.exercise_name {
+    width: 5em;
 }
 
-.exercise_rest {
-    width: 3em;
+.today {
+    border: 0.2em solid rgba(26, 4, 4, 0.7);
 }
-
-
