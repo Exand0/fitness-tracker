@@ -94,9 +94,6 @@
     text-align: center;
 }
 
-.workout_table tr td input{
-    max-width: 5em;
-}
 
 .exercise_weight {
     width: 3em;
